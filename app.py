@@ -1,38 +1,11 @@
 import pandas as pd
 import streamlit as st
 
-# --- Load data from CSV instead of SQL ---
+# --- Load data from CSV ---
 df = pd.read_csv("machines.csv")
 
 # --- Dashboard Title ---
 st.title("Smart Equipment Dashboard")
-
-# --- Show the data table ---
-st.dataframe(df)
-
-# --- Status Summary Chart ---
-st.subheader("Machine Status Overview")
-status_counts = df["Status"].value_counts()
-st.bar_chart(status_counts)
-
-# --- Loop through each machine and show its image + status ---
-st.subheader("Machine Details")
-for i, row in df.iterrows():
-    st.markdown(f"### {row['MachineName']}")
-    st.image(row["ImageFile"])
-
-    # Color-coded status
-    if row["Status"].lower() == "running":
-        st.success(f"Status: {row['Status']}")
-    elif row["Status"].lower() == "idle":
-        st.warning(f"Status: {row['Status']}")
-    else:
-        st.error(f"Status: {row['Status']}")
-import streamlit as st
-
-# --- Dashboard Title ---
-st.title("Smart Equipment Dashboard")
-
 
 # --- KPIs ---
 st.metric("Total Machines", len(df))
@@ -49,6 +22,19 @@ st.bar_chart(df['Location'].value_counts())
 # --- Machine Table ---
 st.subheader("Machine List")
 st.dataframe(df)
+
+# --- Machine Details with Color-Coded Alerts ---
+st.subheader("Machine Details")
+for i, row in df.iterrows():
+    st.markdown(f"### {row['Name']}")
+    st.image(row["ImageUrl"])
+    if row["Status"].lower() == "working":
+        st.success(f"Status: {row['Status']}")
+    elif row["Status"].lower() in ["idle", "out"]:
+        st.warning(f"Status: {row['Status']}")
+    else:
+        st.error(f"Status: {row['Status']}")
+
 # --- Update Machine Status ---
 st.subheader("Update Machine Status")
 
@@ -56,47 +42,16 @@ st.subheader("Update Machine Status")
 machine_name = st.selectbox("Select Machine", df['Name'])
 
 # Choose new status
-new_status = st.selectbox("New Status", ["Working", "Faulty", "In", "Out"])
+new_status = st.selectbox("New Status", ["Working", "Faulty", "Idle", "Out"])
 
-# Update button
+# Apply update
 if st.button("Update Status"):
-    cursor = conn.cursor()
-    cursor.execute("UPDATE Machines SET Status=? WHERE Name=?", (new_status, machine_name))
-    conn.commit()
-    st.success(f"Status for {machine_name} updated to {new_status}!")
-    import streamlit as st
-import pandas as pd
-import plotly.express as px
+    df.loc[df['Name'] == machine_name, 'Status'] = new_status
+    st.success(f"Updated {machine_name} to {new_status}")
+    st.dataframe(df)
 
-# Example dataframe (replace with your SQL query result)
-# df = pd.read_sql("SELECT * FROM Machines", conn)
-
-import datetime
-
-st.subheader("Update Machine Location")
-
-# Select the machine you want to move
-machine_name = st.selectbox("Select Machine", df['Name'], key="update_machine_location")
-
-# Get current location
-current_row = df[df['Name'] == machine_name].iloc[0]
-st.write(f"Current Location: {current_row['Location']}")
-
-# Enter new location
-new_location = st.text_input("New Location", current_row['Location'], key="new_location_input")
-
-# Update button
-if st.button("Change Location", key="change_location_button"):
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE Machines SET Location=?, LastUpdated=? WHERE Name=?",
-        (new_location, datetime.datetime.now(), machine_name)
-    )
-    conn.commit()
-    st.success(f"{machine_name} moved → New Location: {new_location}")
-
-    import pandas as pd
-import streamlit as st
+    # Optional: save back to CSV so changes persist
+    df.to_csv("machines.csv", index=False)
 
 # machine image adding
 
