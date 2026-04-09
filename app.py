@@ -1,20 +1,33 @@
-
-import pyodbc
 import pandas as pd
+import streamlit as st
 
-# --- Connect to SQL Server ---
-conn = pyodbc.connect(
-    'DRIVER={ODBC Driver 17 for SQL Server};'
-    'SERVER=localhost;'          
-    'DATABASE=SmartInventory;'   
-    'Trusted_Connection=yes;' 
-)
+# --- Load data from CSV instead of SQL ---
+df = pd.read_csv("machines.csv")
 
-# --- Load data from SQL Server ---
-df = pd.read_sql("SELECT * FROM Machines;", conn)
+# --- Dashboard Title ---
+st.title("Smart Equipment Dashboard")
 
-# --- Print data to confirm ---
-print(df)
+# --- Show the data table ---
+st.dataframe(df)
+
+# --- Status Summary Chart ---
+st.subheader("Machine Status Overview")
+status_counts = df["Status"].value_counts()
+st.bar_chart(status_counts)
+
+# --- Loop through each machine and show its image + status ---
+st.subheader("Machine Details")
+for i, row in df.iterrows():
+    st.markdown(f"### {row['MachineName']}")
+    st.image(row["ImageFile"])
+
+    # Color-coded status
+    if row["Status"].lower() == "running":
+        st.success(f"Status: {row['Status']}")
+    elif row["Status"].lower() == "idle":
+        st.warning(f"Status: {row['Status']}")
+    else:
+        st.error(f"Status: {row['Status']}")
 import streamlit as st
 
 # --- Dashboard Title ---
