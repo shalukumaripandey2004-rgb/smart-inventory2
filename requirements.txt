@@ -1,0 +1,3 @@
+streamlit
+pandas
+pyodbc   # only if you connect to SQL Server

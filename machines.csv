@@ -1,0 +1,11 @@
+Name,Status,Location,ImageUrl
+Fridge,Working,Kitchen,images/fridge.jpg
+Coffee Machine,Faulty,Pantry,images/coffee.jpg
+Microwave,Working,Office,images/microwave.jpg
+Toaster,Out,Kitchen,images/toaster.jpg
+Blender,Working,Pantry,images/blender.jpg
+Oven,Working,Kitchen,images/oven.jpg
+Dishwasher,Working,Kitchen,images/dishwasher.jpg
+Water Purifier,Faulty,Pantry,images/purifier.jpg
+Air Fryer,Working,Pantry,images/airfryer.jpg
+Ice Maker,Working,Office,images/icemaker.jpg
